@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>おみくじ - Omikuji</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 30px;
+        }
+
+        .omikuji-box {
+            background: linear-gradient(145deg, #ff6b6b, #ee5a5a);
+            border-radius: 15px;
+            padding: 60px 40px;
+            margin: 30px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(238, 90, 90, 0.4);
+        }
+
+        .omikuji-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(238, 90, 90, 0.5);
+        }
+
+        .omikuji-box:active {
+            transform: translateY(0);
+        }
+
+        .omikuji-box.shaking {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px) rotate(-5deg); }
+            50% { transform: translateX(10px) rotate(5deg); }
+            75% { transform: translateX(-10px) rotate(-5deg); }
+        }
+
+        .omikuji-text {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .result {
+            display: none;
+            margin-top: 30px;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .result.show {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fortune-level {
+            font-size: 4rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .fortune-daikichi { color: #ff6b6b; }
+        .fortune-kichi { color: #ffd93d; }
+        .fortune-shokichi { color: #6bcb77; }
+        .fortune-suekichi { color: #4d96ff; }
+        .fortune-kyo { color: #9b9b9b; }
+
+        .fortune-message {
+            color: #555;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .draw-again {
+            background: linear-gradient(145deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .draw-again:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .stamp {
+            width: 80px;
+            height: 80px;
+            margin: 20px auto;
+            border: 3px solid #ff6b6b;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ff6b6b;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transform: rotate(-15deg);
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>おみくじ</h1>
+        <p class="subtitle">Japanese Fortune Telling</p>
+
+        <div class="omikuji-box" id="omikujiBox">
+            <div class="omikuji-text">Click to Draw</div>
+        </div>
+
+        <div class="result" id="result">
+            <div class="fortune-level" id="fortuneLevel"></div>
+            <div class="fortune-message" id="fortuneMessage"></div>
+            <div class="stamp" id="stamp"></div>
+            <button class="draw-again" id="drawAgain">Draw Again</button>
+        </div>
+    </div>
+
+    <script>
+        const fortunes = [
+            {
+                level: "大吉",
+                class: "fortune-daikichi",
+                message: "Excellent fortune! Your wishes will come true. Good news is coming your way. This is the perfect time to start new endeavors.",
+                stamp: "BEST!"
+            },
+            {
+                level: "吉",
+                class: "fortune-kichi",
+                message: "Good fortune! Things will go well. Stay positive and keep moving forward. Your efforts will be rewarded.",
+                stamp: "GOOD"
+            },
+            {
+                level: "中吉",
+                class: "fortune-kichi",
+                message: "Moderate fortune. With patience and effort, you will succeed. Be thankful for small blessings.",
+                stamp: "LUCKY"
+            },
+            {
+                level: "小吉",
+                class: "fortune-shokichi",
+                message: "Small fortune. Little joys will bring happiness. Appreciate the small things in life.",
+                stamp: "OK"
+            },
+            {
+                level: "末吉",
+                class: "fortune-suekichi",
+                message: "Future fortune. Good things will come later. Don't give up, keep trying.",
+                stamp: "WAIT"
+            },
+            {
+                level: "凶",
+                class: "fortune-kyo",
+                message: "Bad fortune. Be cautious and careful. This too shall pass. Stay calm and think before acting.",
+                stamp: "CARE"
+            }
+        ];
+
+        const omikujiBox = document.getElementById('omikujiBox');
+        const result = document.getElementById('result');
+        const fortuneLevel = document.getElementById('fortuneLevel');
+        const fortuneMessage = document.getElementById('fortuneMessage');
+        const stamp = document.getElementById('stamp');
+        const drawAgain = document.getElementById('drawAgain');
+
+        function drawFortune() {
+            omikujiBox.classList.add('shaking');
+
+            setTimeout(() => {
+                omikujiBox.classList.remove('shaking');
+                omikujiBox.style.display = 'none';
+
+                const fortune = fortunes[Math.floor(Math.random() * fortunes.length)];
+
+                fortuneLevel.textContent = fortune.level;
+                fortuneLevel.className = 'fortune-level ' + fortune.class;
+                fortuneMessage.textContent = fortune.message;
+                stamp.textContent = fortune.stamp;
+
+                result.classList.add('show');
+            }, 500);
+        }
+
+        function reset() {
+            result.classList.remove('show');
+            omikujiBox.style.display = 'block';
+        }
+
+        omikujiBox.addEventListener('click', drawFortune);
+        drawAgain.addEventListener('click', reset);
+    </script>
+</body>
+</html>
