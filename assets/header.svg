@@ -166,11 +166,11 @@
 
   <!-- Title with animated glow and gradient -->
   <g filter="url(#glow)">
-    <text x="600" y="150" font-family="Arial, sans-serif" font-size="72" font-weight="bold" fill="url(#text-gradient)" text-anchor="middle" letter-spacing="2">claude glm actions lab</text>
+    <text x="600" y="150" font-family="Georgia, 'Times New Roman', serif" font-size="72" font-weight="bold" fill="url(#text-gradient)" text-anchor="middle" letter-spacing="2">claude glm actions lab</text>
   </g>
 
-  <!-- Subtitle with fashion palette color -->
-  <text x="600" y="200" font-family="Arial, sans-serif" font-size="22" fill="#F2BC57" text-anchor="middle" opacity="0.9">
+  <!-- Subtitle with elegant font -->
+  <text x="600" y="200" font-family="Georgia, 'Times New Roman', serif" font-size="20" font-style="italic" fill="#F2BC57" text-anchor="middle" opacity="0.9">
     Claude Code GitHub Actions with GLM API
     <animate attributeName="opacity" values="0.9;1;0.9" dur="4s" repeatCount="indefinite"/>
   </text>
