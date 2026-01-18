@@ -82,35 +82,42 @@ jobs:
           # Claudeの最新のコメントを取得
           CLAUDE_COMMENT=$(gh issue view "$ISSUE_NUMBER" --json comments --jq '.comments[] | select(.author.login == "claude[bot]") | .body' | tail -n 1)
 
-          # コメントからタイトルを抽出（### ✅ 完了 の後のテキスト）
-          PR_TITLE=$(echo "$CLAUDE_COMMENT" | grep -A1 "### ✅ 完了" | tail -n1 | sed 's/^[[:space:]]*//')
-          if [ -z "$PR_TITLE" ]; then
-            PR_TITLE="${{ github.event.issue.title }}"
-          fi
+          # 「Create PR ➔」リンクのURLを抽出
+          CREATE_PR_URL=$(echo "$CLAUDE_COMMENT" | grep -oP '\[Create PR ➔\]\(\K[^)]+' || echo "")
 
-          # Issueタイトルからプレフィックスを生成（例: サイコロアプリを作って → feat: サイコロアプリを追加）
-          ISSUE_TITLE="${{ github.event.issue.title }}"
-          if [[ "$ISSUE_TITLE" =~ を作って|を作成|を追加 ]]; then
-            PR_PREFIX="feat:"
-          elif [[ "$ISSUE_TITLE" =~ を修正|を直して|を修正 ]]; then
-            PR_PREFIX="fix:"
-          elif [[ "$ISSUE_TITLE" =~ を更新|を変更 ]]; then
-            PR_PREFIX="update:"
+          if [ -n "$CREATE_PR_URL" ]; then
+            # URLからtitleとbodyパラメータを抽出
+            ENCODED_TITLE=$(echo "$CREATE_PR_URL" | grep -oP 'title=\K[^&]+')
+            ENCODED_BODY=$(echo "$CREATE_PR_URL" |grep -oP 'body=\K[^&]+')
+
+            # URLデコード（python3を使用）
+            PR_TITLE=$(python3 -c "import sys, urllib.parse; print(urllib.parse.unquote('$ENCODED_TITLE'))")
+            PR_BODY=$(python3 -c "import sys, urllib.parse; print(urllib.parse.unquote('$ENCODED_BODY'))")
           else
-            PR_PREFIX=""
+            # フォールバック: Issueタイトルを使用
+            ISSUE_TITLE="${{ github.event.issue.title }}"
+            if [[ "$ISSUE_TITLE" =~ を作って|を作成|を追加 ]]; then
+              PR_PREFIX="feat:"
+            elif [[ "$ISSUE_TITLE" =~ を修正|を直して|を修正 ]]; then
+              PR_PREFIX="fix:"
+            elif [[ "$ISSUE_TITLE" =~ を更新|を変更 ]]; then
+              PR_PREFIX="update:"
+            else
+              PR_PREFIX=""
+            fi
+
+            if [ -n "$PR_PREFIX" ]; then
+              FINAL_TITLE=$(echo "$ISSUE_TITLE" | sed 's/を作って/を追加/' | sed 's/を作成/を追加/' | sed 's/を追加$/を追加する/')
+              PR_TITLE="$PR_PREFIX $FINAL_TITLE"
+            else
+              PR_TITLE="$ISSUE_TITLE"
+            fi
+
+            PR_BODY="$CLAUDE_COMMENT"
           fi
 
-          # プレフィックス付きのタイトル
-          if [ -n "$PR_PREFIX" ]; then
-            # 「〜を作って」を「〜を追加」に変換
-            FINAL_TITLE=$(echo "$ISSUE_TITLE" | sed 's/を作って/を追加/' | sed 's/を作成/を追加/' | sed 's/を追加$/を追加する/')
-            FINAL_TITLE="$PR_PREFIX $FINAL_TITLE"
-          else
-            FINAL_TITLE="$PR_TITLE"
-          fi
-
-          # コメント全体をPR本文として使用
-          PR_BODY="$CLAUDE_COMMENT
+          # PR本文にClosesとGenerated withを追加
+          FINAL_BODY="$PR_BODY
 
           ---
 
@@ -122,6 +129,6 @@ jobs:
           gh pr create \
             --base main \
             --head "$BRANCH_NAME" \
-            --title "$FINAL_TITLE" \
-            --body "$PR_BODY" \
+            --title "$PR_TITLE" \
+            --body "$FINAL_BODY" \
             || echo "PR creation failed or branch has no changes"
