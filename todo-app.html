@@ -58,6 +58,28 @@
             border-color: #667eea;
         }
 
+        #todoInput.error {
+            border-color: #ff4757;
+            animation: shake 0.3s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .error-message {
+            color: #ff4757;
+            font-size: 14px;
+            margin-bottom: 8px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
         #addBtn {
             padding: 14px 24px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -117,10 +139,16 @@
             justify-content: center;
             flex-shrink: 0;
             transition: all 0.2s;
+            position: relative;
         }
 
         .checkbox:hover {
             background: rgba(102, 126, 234, 0.1);
+        }
+
+        .checkbox:focus {
+            outline: 2px solid #667eea;
+            outline-offset: 2px;
         }
 
         .checkbox.checked {
@@ -159,6 +187,11 @@
             transform: scale(1.05);
         }
 
+        .deleteBtn:focus {
+            outline: 2px solid #ff4757;
+            outline-offset: 2px;
+        }
+
         .empty-state {
             text-align: center;
             padding: 48px 24px;
@@ -171,6 +204,100 @@
             display: block;
             font-size: 48px;
             margin-bottom: 16px;
+        }
+
+        /* 確認ダイアログのスタイル */
+        .dialog-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.2s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .dialog {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .dialog-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        .dialog-message {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .dialog-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .dialog-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .dialog-btn.cancel {
+            background: #f0f0f0;
+            color: #666;
+        }
+
+        .dialog-btn.cancel:hover {
+            background: #e0e0e0;
+        }
+
+        .dialog-btn.confirm {
+            background: #ff4757;
+            color: white;
+        }
+
+        .dialog-btn.confirm:hover {
+            background: #ff3344;
+        }
+
+        .dialog-btn:focus {
+            outline: 2px solid #667eea;
+            outline-offset: 2px;
         }
 
         @media (max-width: 480px) {
@@ -195,37 +322,80 @@
 <body>
     <div class="container">
         <h1>TODO App ✨</h1>
+        <div class="error-message" id="errorMessage">テキストを入力してねー！✨</div>
         <div class="input-container">
-            <input type="text" id="todoInput" placeholder="新しいタスクを追加..." />
+            <input type="text" id="todoInput" placeholder="新しいタスクを追加..." aria-label="新しいタスク" />
             <button id="addBtn">追加</button>
         </div>
-        <ul id="todoList"></ul>
+        <ul id="todoList" role="list" aria-label="タスクリスト"></ul>
     </div>
 
     <script>
+        // UUID生成関数
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
         // ローカルストレージからタスクを読み込む
         let todos = JSON.parse(localStorage.getItem('todos')) || [];
 
         const todoInput = document.getElementById('todoInput');
         const addBtn = document.getElementById('addBtn');
         const todoList = document.getElementById('todoList');
+        const errorMessage = document.getElementById('errorMessage');
 
-        // タスクリストを表示
+        // タスクリストを表示（DOM操作版）
         function renderTodos() {
+            // 現在のリストをクリア
+            while (todoList.firstChild) {
+                todoList.removeChild(todoList.firstChild);
+            }
+
             if (todos.length === 0) {
-                todoList.innerHTML = '<li class="empty-state">タスクがないよー！<br>上から追加してね⁉</li>';
+                const emptyLi = document.createElement('li');
+                emptyLi.className = 'empty-state';
+                emptyLi.textContent = 'タスクがないよー！上から追加してね⁉';
+                todoList.appendChild(emptyLi);
                 return;
             }
 
-            todoList.innerHTML = todos
-                .map((todo, index) => `
-                    <li class="todo-item ${todo.completed ? 'completed' : ''}">
-                        <div class="checkbox ${todo.completed ? 'checked' : ''}" onclick="toggleTodo(${index})"></div>
-                        <span class="todo-text">${escapeHtml(todo.text)}</span>
-                        <button class="deleteBtn" onclick="deleteTodo(${index})">削除</button>
-                    </li>
-                `)
-                .join('');
+            // 各タスクをDOMとして追加
+            todos.forEach(todo => {
+                const li = document.createElement('li');
+                li.className = `todo-item ${todo.completed ? 'completed' : ''}`;
+                li.setAttribute('data-id', todo.id);
+
+                // チェックボックス
+                const checkbox = document.createElement('div');
+                checkbox.className = `checkbox ${todo.completed ? 'checked' : ''}`;
+                checkbox.setAttribute('role', 'checkbox');
+                checkbox.setAttribute('aria-checked', todo.completed);
+                checkbox.setAttribute('tabindex', '0');
+                checkbox.addEventListener('click', () => toggleTodo(todo.id));
+                checkbox.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        toggleTodo(todo.id);
+                    }
+                });
+
+                // テキスト
+                const text = document.createElement('span');
+                text.className = 'todo-text';
+                text.textContent = todo.text;
+
+                // 削除ボタン
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'deleteBtn';
+                deleteBtn.textContent = '削除';
+                deleteBtn.setAttribute('aria-label', `タスク「${escapeHtml(todo.text)}」を削除`);
+                deleteBtn.addEventListener('click', () => deleteTodo(todo.id));
+
+                li.appendChild(checkbox);
+                li.appendChild(text);
+                li.appendChild(deleteBtn);
+                todoList.appendChild(li);
+            });
         }
 
         // HTMLエスケープ（XSS対策）
@@ -240,15 +410,90 @@
             localStorage.setItem('todos', JSON.stringify(todos));
         }
 
+        // エラーメッセージを表示
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.add('show');
+            todoInput.classList.add('error');
+            setTimeout(() => {
+                errorMessage.classList.remove('show');
+                todoInput.classList.remove('error');
+            }, 2000);
+        }
+
+        // 確認ダイアログを表示
+        function showConfirm(message) {
+            return new Promise((resolve) => {
+                const overlay = document.createElement('div');
+                overlay.className = 'dialog-overlay';
+
+                const dialog = document.createElement('div');
+                dialog.className = 'dialog';
+
+                const title = document.createElement('div');
+                title.className = 'dialog-title';
+                title.textContent = '確認';
+
+                const messageEl = document.createElement('div');
+                messageEl.className = 'dialog-message';
+                messageEl.textContent = message;
+
+                const buttons = document.createElement('div');
+                buttons.className = 'dialog-buttons';
+
+                const cancelBtn = document.createElement('button');
+                cancelBtn.className = 'dialog-btn cancel';
+                cancelBtn.textContent = 'キャンセル';
+                cancelBtn.addEventListener('click', () => {
+                    document.body.removeChild(overlay);
+                    resolve(false);
+                });
+
+                const confirmBtn = document.createElement('button');
+                confirmBtn.className = 'dialog-btn confirm';
+                confirmBtn.textContent = '削除';
+                confirmBtn.addEventListener('click', () => {
+                    document.body.removeChild(overlay);
+                    resolve(true);
+                });
+
+                buttons.appendChild(cancelBtn);
+                buttons.appendChild(confirmBtn);
+                dialog.appendChild(title);
+                dialog.appendChild(messageEl);
+                dialog.appendChild(buttons);
+                overlay.appendChild(dialog);
+                document.body.appendChild(overlay);
+
+                // キャンセルボタンにフォーカス
+                cancelBtn.focus();
+
+                // ESCキーでキャンセル
+                const escapeHandler = (e) => {
+                    if (e.key === 'Escape') {
+                        document.body.removeChild(overlay);
+                        document.removeEventListener('keydown', escapeHandler);
+                        resolve(false);
+                    }
+                };
+                document.addEventListener('keydown', escapeHandler);
+            });
+        }
+
         // タスクを追加
         function addTodo() {
             const text = todoInput.value.trim();
             if (text === '') {
-                alert('テキストを入力してねー！✨');
+                showError('テキストを入力してねー！✨');
+                todoInput.focus();
                 return;
             }
 
-            todos.push({ text, completed: false });
+            todos.push({
+                id: generateId(),
+                text,
+                completed: false
+            });
             saveTodos();
             renderTodos();
             todoInput.value = '';
@@ -256,17 +501,26 @@
         }
 
         // タスクを削除
-        function deleteTodo(index) {
-            todos.splice(index, 1);
-            saveTodos();
-            renderTodos();
+        async function deleteTodo(id) {
+            const todo = todos.find(t => t.id === id);
+            if (!todo) return;
+
+            const confirmed = await showConfirm(`「${escapeHtml(todo.text)}」を削除してもいい？`);
+            if (confirmed) {
+                todos = todos.filter(t => t.id !== id);
+                saveTodos();
+                renderTodos();
+            }
         }
 
         // 完了状態を切り替え
-        function toggleTodo(index) {
-            todos[index].completed = !todos[index].completed;
-            saveTodos();
-            renderTodos();
+        function toggleTodo(id) {
+            const todo = todos.find(t => t.id === id);
+            if (todo) {
+                todo.completed = !todo.completed;
+                saveTodos();
+                renderTodos();
+            }
         }
 
         // イベントリスナー
@@ -275,6 +529,12 @@
             if (e.key === 'Enter') {
                 addTodo();
             }
+        });
+
+        // 入力時にエラー状態をリセット
+        todoInput.addEventListener('input', () => {
+            todoInput.classList.remove('error');
+            errorMessage.classList.remove('show');
         });
 
         // 初期表示
