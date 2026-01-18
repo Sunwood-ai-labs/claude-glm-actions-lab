@@ -3,33 +3,59 @@ name: CLAUDE_CODE_GLM_DEV
 on:
   issue_comment:
     types: [created]
+  issues:
+    types: [opened, assigned]
   pull_request_review_comment:
     types: [created]
 
-permissions:
-  contents: write
-  pull-requests: write
-  issues: write
-  id-token: write
+# 同じIssue/PRでは同時に走らないようにする
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.issue.number || github.event.pull_request.number }}
+  cancel-in-progress: false
 
 jobs:
-  CLAUDE:
+  claude:
+    if: |
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'issues' && contains(github.event.issue.body, '@claude'))
     runs-on: ubuntu-latest
 
-    # ついでに bot 自己トリガーを防ぐ（推奨）
-    if: github.actor != 'claude[bot]'
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      # ★ここで「この実行が使うブランチ名」を決め打ちする
+      - name: Compute branch name
+        id: branch
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request_review_comment" ]]; then
+            echo "name=claude-glm-dev-pr-${{ github.event.pull_request.number }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "name=claude-glm-dev-issue-${{ github.event.issue.number }}" >> "$GITHUB_OUTPUT"
+          fi
 
       - uses: anthropics/claude-code-action@v1
         with:
-          anthropic_api_key: ${{ secrets.ZAI_API_KEY }}
-        env:
-          ANTHROPIC_BASE_URL: ${{ vars.ANTHROPIC_BASE_URL || 'https://api.z.ai/api/anthropic' }}
-          ANTHROPIC_AUTH_TOKEN: ${{ secrets.ZAI_API_KEY }}
+          trigger_phrase: "@claude"
 
-          API_TIMEOUT_MS: ${{ vars.API_TIMEOUT_MS || '3000000' }}
-          ANTHROPIC_DEFAULT_OPUS_MODEL: ${{ vars.ANTHROPIC_DEFAULT_OPUS_MODEL || 'glm-4.7' }}
-          ANTHROPIC_DEFAULT_SONNET_MODEL: ${{ vars.ANTHROPIC_DEFAULT_SONNET_MODEL || 'glm-4.7' }}
-          ANTHROPIC_DEFAULT_HAIKU_MODEL: ${{ vars.ANTHROPIC_DEFAULT_HAIKU_MODEL || 'glm-4.5-air' }}
+          # ★ブランチ名を固定（タイムスタンプなし）
+          branch_prefix: ""
+          branch_name_template: "claude-glm-dev-issue-1"
+
+          # ★追加：バリデーション通過用に必要
+          anthropic_api_key: ${{ secrets.CLAUDE_GLM_DEV_API_KEY }}
+
+        env:
+          # GLMに向ける設定
+          ANTHROPIC_BASE_URL: https://api.z.ai/api/anthropic
+          ANTHROPIC_AUTH_TOKEN: ${{ secrets.CLAUDE_GLM_DEV_API_KEY }}
+          API_TIMEOUT_MS: "3000000"
