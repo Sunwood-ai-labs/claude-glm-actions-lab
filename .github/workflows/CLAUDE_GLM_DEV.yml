@@ -82,8 +82,8 @@ jobs:
           # Claudeの最新のコメントを取得
           CLAUDE_COMMENT=$(gh issue view "$ISSUE_NUMBER" --json comments --jq '.comments[] | select(.author.login == "claude[bot]") | .body' | tail -n 1)
 
-          # 「Create PR ➔」リンクのURLを抽出
-          CREATE_PR_URL=$(echo "$CLAUDE_COMMENT" | grep -oP '\[Create PR ➔\]\(\K[^)]+' || echo "")
+          # 「Create PR ➔」リンクのURLを抽出（複数行対応）
+          CREATE_PR_URL=$(echo "$CLAUDE_COMMENT" | tr '\n' ' ' | grep -oP '\[Create PR ➔\]\(\K[^)]+' || echo "")
 
           if [ -n "$CREATE_PR_URL" ]; then
             # URLからtitleとbodyパラメータを抽出
