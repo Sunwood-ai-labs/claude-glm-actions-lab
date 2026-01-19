@@ -7,6 +7,8 @@ on:
     types: [opened, assigned]
   pull_request_review_comment:
     types: [created]
+  pull_request:
+    types: [opened]
 
 # 同じIssue/PRでは同時に走らないようにする
 concurrency:
@@ -18,7 +20,8 @@ jobs:
     if: |
       (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
       (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
-      (github.event_name == 'issues' && contains(github.event.issue.body, '@claude'))
+      (github.event_name == 'issues' && contains(github.event.issue.body, '@claude')) ||
+      github.event_name == 'pull_request'
     runs-on: ubuntu-latest
 
     # デフォルト設定（必要に応じてオーバーライド可能）
@@ -42,7 +45,7 @@ jobs:
         id: branch
         shell: bash
         run: |
-          if [[ "${{ github.event_name }}" == "pull_request_review_comment" ]]; then
+          if [[ "${{ github.event_name }}" == "pull_request_review_comment" ]] || [[ "${{ github.event_name }}" == "pull_request" ]]; then
             echo "name=claude-glm-dev-pr-${{ github.event.pull_request.number }}" >> "$GITHUB_OUTPUT"
           else
             echo "name=claude-glm-dev-issue-${{ github.event.issue.number }}" >> "$GITHUB_OUTPUT"
