@@ -17,6 +17,9 @@
   <a href="https://github.com/Sunwood-AI-OSS-Hub/claude-glm-actions-lab/blob/main/LICENSE">
     <img src="https://img.shields.io/github/license/Sunwood-AI-OSS-Hub/claude-glm-actions-lab?style=flat-square" alt="License"/>
   </a>
+  <a href="./README.ja.md">
+    <img src="https://img.shields.io/badge/lang-日本語-red.svg?style=flat-square" alt="日本語"/>
+  </a>
 </p>
 
 ## Overview
@@ -29,7 +32,7 @@ Claude Code GitHub Actions with GLM API integration laboratory. This repository 
 - Support for issue comments and pull request reviews
 - Configurable API endpoints and models
 - Bot self-trigger prevention
-- Character-based AI agents (ギャル先輩 & 姐さん)
+- Character-based AI agents (Gyaru-senpai & Onee-san)
 - Repository synchronization scripts for sandbox testing
 
 ## Directory Structure
@@ -38,8 +41,8 @@ Claude Code GitHub Actions with GLM API integration laboratory. This repository 
 claude-glm-actions-lab/
 ├── .claude/
 │   └── rules/               # Character agent rules
-│       ├── implementer.md   # ギャル先輩インプリメーター 🔥
-│       └── reviewer.md      # 姐さんレビュアー 👠
+│       ├── implementer.md   # Gyaru-senpai Implementer 🔥
+│       └── reviewer.md      # Onee-san Reviewer 👠
 ├── .github/
 │   ├── scripts/             # Utility scripts
 │   │   └── create-pr.py     # Auto PR creation script
@@ -79,19 +82,19 @@ The `sandbox/claude-glm-actions-lab-sandbox/` directory is dedicated to **CI/CD 
 
 This project uses character-based AI agents for different tasks:
 
-### 美咲（ミサキ）先輩 - Implementer 🔥
+### Misaki-senpai - Implementer 🔥
 
-- **Role**: Implementation担当
-- **Personality**: 明るくて、ちょっとおっちょこちょい。でもやる時はやる！
+- **Role**: Implementation Lead
+- **Personality**: Bright and cheerful, a bit clumsy but gets the job done when it matters!
 - **File**: `.claude/rules/implementer.md`
-- **Style**: 若者言葉全開、絵文字たくさん「マジで」「やばい」
+- **Style**: Full-on youth slang, lots of emojis, phrases like "seriously" and "yabai"
 
-### 玲子（レイコ）姐さん - Reviewer 👠
+### Reiko-onee-san - Reviewer 👠
 
-- **Role**: Codeレビュー＆修正担当
-- **Personality**: 厳しいけど面倒見が良い。昔から業界にいるベテラン
+- **Role**: Code Review & Fixes Lead
+- **Personality**: Strict but caring. A veteran who's been in the industry for ages
 - **File**: `.claude/rules/reviewer.md`
-- **Style**: 姐さん言葉「〜だねぇ」「ちゃんと」「まあいいわ」
+- **Style**: Onee-san speech, phrases like "dane", "chanto", "maa ii wa"
 
 ## Usage
 
