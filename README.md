@@ -1,8 +1,8 @@
-# claude-glm-actions-lab
-
-<p align="center">
+<div align="center">
   <img src="./assets/header.svg" alt="claude-glm-actions-lab header" width="100%"/>
-</p>
+
+
+# claude-glm-actions-lab
 
 <p align="center">
   <a href="https://github.com/Sunwood-AI-OSS-Hub/claude-glm-actions-lab/stargazers">
@@ -21,6 +21,8 @@
     <img src="https://img.shields.io/badge/lang-日本語-red.svg?style=flat-square" alt="日本語"/>
   </a>
 </p>
+
+</div>
 
 ## Overview
 
