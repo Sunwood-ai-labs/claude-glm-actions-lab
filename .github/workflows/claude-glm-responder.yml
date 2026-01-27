@@ -28,6 +28,8 @@ jobs:
     env:
       CREATE_AUTO_PR: "true"              # Issueからのトリガー時に自動でPRを作成するかどうか
       INCLUDE_TASK_SUMMARY: "true"        # タスクサマリー（---より後ろの報告内容）を含めるかどうか
+      SCRIPT_SOURCE: "remote"             # スクリプトのソース: local または remote
+      SCRIPT_URL: "https://raw.githubusercontent.com/Sunwood-AI-OSS-Hub/claude-glm-actions-lab-sandbox/refs/heads/main/.github/scripts/create-pr.py"
 
     permissions:
       contents: write
@@ -83,7 +85,20 @@ jobs:
             exit 0
           fi
 
-          # INCLUDE_TASK_SUMMARY は job レベルの環境変数から継承
-          python3 .github/scripts/create-pr.py \
-            "${{ steps.branch.outputs.name }}" \
-            "${{ github.event.issue.number }}"
+          # スクリプトの実行（ローカル/リモート切り替え）
+          if [[ "${{ env.SCRIPT_SOURCE }}" == "remote" ]]; then
+            if [[ -z "${{ env.SCRIPT_URL }}" ]]; then
+              echo "ERROR: SCRIPT_SOURCE=remote but SCRIPT_URL is not set!"
+              exit 1
+            fi
+            echo "Downloading script from remote..."
+            curl -fsSL "${{ env.SCRIPT_URL }}" -o /tmp/create-pr.py
+            python3 /tmp/create-pr.py \
+              "${{ steps.branch.outputs.name }}" \
+              "${{ github.event.issue.number }}"
+          else
+            echo "Using local script..."
+            python3 .github/scripts/create-pr.py \
+              "${{ steps.branch.outputs.name }}" \
+              "${{ github.event.issue.number }}"
+          fi
