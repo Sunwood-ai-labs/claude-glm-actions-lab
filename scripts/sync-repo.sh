@@ -282,15 +282,6 @@ fi
 if [ "$SYNC_AGENTS" = true ]; then
     sync_to_repos "Agents" "sync-agents.sh"
 fi
-        sync_to_repos "Secrets" "sync-secrets.sh"
-        sync_to_repos "Workflows" "sync-workflows.sh"
-        sync_to_repos "Agents" "sync-agents.sh"
-        ;;
-    *)
-        echo -e "${RED}無効な選択です${NC}"
-        exit 1
-        ;;
-esac
 
 echo ""
 echo -e "${GREEN}${BOLD}=== 完了 ===${NC}"
