@@ -68,7 +68,10 @@ claude-glm-actions-lab/
 └── scripts/                 # 同期スクリプト（ルートレベル）
     ├── sync-repo.sh
     ├── sync-secrets.sh
-    └── sync-workflows.sh
+    ├── sync-workflows.sh
+    ├── sync-agents.sh
+    ├── sync-repo-tui.sh
+    └── install-sync-repo-tui.sh
 ```
 
 ### sandbox/ ディレクトリ
@@ -131,20 +134,32 @@ claude-glm-actions-lab/
 サンドボックステスト管理用の同期スクリプトが含まれています。
 
 #### sync-repo.sh
-シークレットとワークフローの同期を調整するメインスクリプト。
+シークレット、ワークフロー、エージェントの同期を調整するメインスクリプト。対話的な TUI を備えています。
 
 ```bash
 ./scripts/sync-repo.sh
+```
+
+**機能:**
+- **単一リポジトリモード**: 特定のターゲットリポジトリに同期
+- **組織モード**: 組織内の全リポジトリに同期（除外リスト対応）
+- **ON/OFF切り替え**: 同期項目（Secrets、Workflows、Agents）を個別に有効/無効化
+
+**設定（`.env`）:**
+```bash
+TARGET_REPO=Sunwood-ai-labs/claude-glm-actions-lab-sandbox  # デフォルトのターゲット
+TARGET_ORG=Sunwood-ai-labs                                   # デフォルトの組織
+EXCLUDED_REPOS=claude-glm-actions-lab-sandbox                # 除外するリポジトリ
 ```
 
 #### sync-secrets.sh
 `.env` ファイルからターゲットリポジトリに GitHub Secrets を同期します。
 
 ```bash
-./scripts/sync-secrets.sh
+TARGET_REPO=org/repo ./scripts/sync-secrets.sh
 ```
 
-設定（`.env`）：
+**設定（`.env`）:**
 ```bash
 TARGET_REPO=Sunwood-ai-labs/claude-glm-actions-lab-sandbox
 SECRET_CLAUDE_GLM_DEV_API_KEY=your_api_key_here
@@ -154,8 +169,39 @@ SECRET_CLAUDE_GLM_DEV_API_KEY=your_api_key_here
 ターゲットリポジトリにワークフローファイルを同期します。
 
 ```bash
-./scripts/sync-workflows.sh
+TARGET_REPO=org/repo ./scripts/sync-workflows.sh
 ```
+
+#### sync-agents.sh
+エージェントファイル（`.claude/agents`）をターゲットリポジトリに同期します。
+
+```bash
+TARGET_REPO=org/repo ./scripts/sync-agents.sh
+```
+
+#### sync-repo-tui.sh
+同期ツールの TUI（Terminal User Interface）版を起動します。
+
+```bash
+./scripts/sync-repo-tui.sh
+```
+
+**前提条件:** まず `sync-repo-tui` バイナリをインストールしてください：
+```bash
+./scripts/install-sync-repo-tui.sh
+```
+
+#### install-sync-repo-tui.sh
+GitHub Releases から `sync-repo-tui` バイナリをインストールします。
+
+```bash
+./scripts/install-sync-repo-tui.sh
+```
+
+**対応プラットフォーム:**
+- Linux (amd64, arm64)
+- macOS (amd64, arm64)
+- Windows (amd64)
 
 ### create-pr.py
 
