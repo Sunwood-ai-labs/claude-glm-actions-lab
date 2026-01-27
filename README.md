@@ -42,16 +42,17 @@ Claude Code GitHub Actions with GLM API integration laboratory. This repository 
 ```
 claude-glm-actions-lab/
 ├── .claude/
-│   └── rules/               # Character agent rules
+│   ├── agents/              # Claude Code Agent definitions
+│   │   ├── reviewer.md      # Reiko-onee-san Reviewer Agent 👠
+│   │   ├── implementer.md   # Misaki-senpai Implementer Agent 🔥
+│   │   └── doc-translator.md # Kotone Documentation Agent 📚
+│   └── rules/               # Character agent rules (legacy)
 │       ├── implementer.md   # Gyaru-senpai Implementer 🔥
 │       └── reviewer.md      # Onee-san Reviewer 👠
 ├── .github/
-│   ├── scripts/             # Utility scripts
-│   │   └── create-pr.py     # Auto PR creation script
 │   └── workflows/           # GitHub Actions workflow definitions
-│       ├── disabled/        # Disabled/minimal workflows
-│       │   └── MINIMAL.yml
-│       └── claude-glm-responder.yml
+│       ├── claude-glm-responder.yml
+│       └── pr-auto-comment.yml
 ├── sandbox/                 # CI/CD implementation testing environment
 │   └── claude-glm-actions-lab-sandbox/
 │       ├── .claude/
@@ -80,7 +81,7 @@ The `sandbox/claude-glm-actions-lab-sandbox/` directory is dedicated to **CI/CD 
 - Integration testing with GLM API endpoints
 - Repository synchronization (Secrets & Workflows)
 
-## AI Characters 👠🔥
+## AI Characters 👠🔥📚
 
 This project uses character-based AI agents for different tasks:
 
@@ -88,15 +89,22 @@ This project uses character-based AI agents for different tasks:
 
 - **Role**: Implementation Lead
 - **Personality**: Bright and cheerful, a bit clumsy but gets the job done when it matters!
-- **File**: `.claude/rules/implementer.md`
+- **File**: `.claude/agents/implementer.md`
 - **Style**: Full-on youth slang, lots of emojis, phrases like "seriously" and "yabai"
 
 ### Reiko-onee-san - Reviewer 👠
 
 - **Role**: Code Review & Fixes Lead
 - **Personality**: Strict but caring. A veteran who's been in the industry for ages
-- **File**: `.claude/rules/reviewer.md`
+- **File**: `.claude/agents/reviewer.md`
 - **Style**: Onee-san speech, phrases like "dane", "chanto", "maa ii wa"
+
+### Kotone - Documenter 📚
+
+- **Role**: Documentation & Translation Lead
+- **Personality**: Intellectual and calm. A bookworm with polite speech and literary expressions
+- **File**: `.claude/agents/doc-translator.md`
+- **Style**: Literary expressions, polite speech, thoughtful and caring tone
 
 ## Usage
 
@@ -156,10 +164,6 @@ Sync workflow files to target repository.
 ./scripts/sync-workflows.sh
 ```
 
-### create-pr.py
-
-Auto-creates Pull Requests from Issues with Claude Code responses. Extracts task summaries and includes them in PR descriptions.
-
 ## Workflow Triggers
 
 The workflow is triggered on:
@@ -169,19 +173,19 @@ The workflow is triggered on:
 
 ## Project Statistics
 
-- **Total Files**: 23
-- **Total Lines**: 2,079
-- **Languages**: Markdown (8), Bash (6), Python (3), YAML (4), Plaintext (2)
+- **Total Files**: 24+
+- **Total Lines**: 2,100+
+- **Languages**: Markdown (9), Bash (6), YAML (2)
 
 ### Language Breakdown
 
 | Language | Files | Lines | Size |
 |----------|-------|-------|------|
-| Markdown | 8 | 790 | 20.5 KB |
+| Markdown | 9 | 840+ | ~22 KB |
 | Bash | 6 | 606 | 18.1 KB |
-| Python | 3 | 433 | 14.5 KB |
-| YAML | 4 | 220 | 7.2 KB |
-| Plaintext | 2 | 30 | 1.2 KB |
+| YAML | 2 | 160+ | ~5 KB |
+
+*Statistics updated after PR #22 cleanup*
 
 ## Repository Information
 
