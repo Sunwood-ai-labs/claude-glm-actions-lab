@@ -43,16 +43,17 @@ Claude Code と GLM API を統合した GitHub Actions の実験リポジトリ�
 ```
 claude-glm-actions-lab/
 ├── .claude/
-│   └── rules/               # キャラクターエージェントルール
+│   ├── agents/              # Claude Code エージェント定義
+│   │   ├── reviewer.md      # 玲子（レイコ）姐さんレビュアーエージェント 👠
+│   │   ├── implementer.md   # 美咲（ミサキ）先輩インプリメーターエージェント 🔥
+│   │   └── doc-translator.md # 琴音（コトネ）ドキュメンターエージェント 📚
+│   └── rules/               # キャラクターエージェントルール（レガシー）
 │       ├── implementer.md   # ギャル先輩インプリメーター 🔥
 │       └── reviewer.md      # 姐さんレビュアー 👠
 ├── .github/
-│   ├── scripts/             # ユーティリティスクリプト
-│   │   └── create-pr.py     # 自動PR作成スクリプト
 │   └── workflows/           # GitHub Actions ワークフロー定義
-│       ├── disabled/        # 無効化/最小限のワークフロー
-│       │   └── MINIMAL.yml
-│       └── claude-glm-responder.yml
+│       ├── claude-glm-responder.yml
+│       └── pr-auto-comment.yml
 ├── sandbox/                 # CI/CD実装テスト環境
 │   └── claude-glm-actions-lab-sandbox/
 │       ├── .claude/
@@ -81,7 +82,7 @@ claude-glm-actions-lab/
 - GLM API エンドポイントとの統合テスト
 - リポジトリ同期（Secrets & Workflows）
 
-## AI キャラクター 👠🔥
+## AI キャラクター 👠🔥📚
 
 このプロジェクトでは、タスク別にキャラクターベースの AI エージェントを使用しています。
 
@@ -89,15 +90,22 @@ claude-glm-actions-lab/
 
 - **役割**: 実装担当
 - **性格**: 明るくて、ちょっとおっちょこちょい。でもやる時はやる！
-- **ファイル**: `.claude/rules/implementer.md`
+- **ファイル**: `.claude/agents/implementer.md`
 - **スタイル**: 若者言葉全開、絵文字たくさん「マジで」「やばい」
 
 ### 玲子（レイコ）姐さん - Reviewer 👠
 
 - **役割**: コードレビュー＆修正担当
 - **性格**: 厳しいけど面倒見が良い。昔から業界にいるベテラン
-- **ファイル**: `.claude/rules/reviewer.md`
+- **ファイル**: `.claude/agents/reviewer.md`
 - **スタイル**: 姐さん言葉「〜だねぇ」「ちゃんと」「まあいいわ」
+
+### 琴音（コトネ） - Documenter 📚
+
+- **役割**: ドキュメント＆翻訳担当
+- **性格**: 知的で穏やか。読書家で、言葉遣いが丁寧。文学的な表現が好き
+- **ファイル**: `.claude/agents/doc-translator.md`
+- **スタイル**: 文学的な表現、丁寧語、思いやりのあるトーン
 
 ## 使用方法
 
@@ -157,10 +165,6 @@ SECRET_CLAUDE_GLM_DEV_API_KEY=your_api_key_here
 ./scripts/sync-workflows.sh
 ```
 
-### create-pr.py
-
-Claude Code のレスポンスから Issue への自動プルリクエストを作成します。タスクの概要を抽出して PR 説明に含めます。
-
 ## ワークフロートリガー
 
 ワークフローは以下の場合にトリガーされます：
@@ -171,19 +175,19 @@ Claude Code のレスポンスから Issue への自動プルリクエストを�
 
 ## プロジェクト統計
 
-- **総ファイル数**: 23
-- **総行数**: 2,079
-- **言語**: Markdown (8), Bash (6), Python (3), YAML (4), Plaintext (2)
+- **総ファイル数**: 24+
+- **総行数**: 2,100+
+- **言語**: Markdown (9), Bash (6), YAML (2)
 
 ### 言語別内訳
 
 | 言語 | ファイル数 | 行数 | サイズ |
 |------|-----------|------|-------|
-| Markdown | 8 | 790 | 20.5 KB |
+| Markdown | 9 | 840+ | ~22 KB |
 | Bash | 6 | 606 | 18.1 KB |
-| Python | 3 | 433 | 14.5 KB |
-| YAML | 4 | 220 | 7.2 KB |
-| Plaintext | 2 | 30 | 1.2 KB |
+| YAML | 2 | 160+ | ~5 KB |
+
+*統計は PR #22 のクリーンアップ後に更新されました*
 
 ## リポジトリ情報
 
