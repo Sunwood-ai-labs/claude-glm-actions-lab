@@ -3,10 +3,10 @@
  */
 
 import * as path from 'path';
-import { directoryExists, findFiles, copyFile, createTempDir, removeTempDir } from '../utils/file';
-import { cloneRepo, hasChanges, addFiles, commit, push } from './git';
-import { WORKFLOW_SOURCE_PATH, GIT_USER_NAME, GIT_USER_EMAIL, WORKFLOW_COMMIT_MESSAGE } from '../config/constants';
-import { GitError } from '../utils/error';
+import { directoryExists, findFiles, copyFile, createTempDir, removeTempDir } from '../utils/file.js';
+import { cloneRepo, hasChanges, addFiles, commit, push } from './git.js';
+import { WORKFLOW_SOURCE_PATH, GIT_USER_NAME, GIT_USER_EMAIL, WORKFLOW_COMMIT_MESSAGE } from '../config/constants.js';
+import { GitError } from '../utils/error.js';
 
 export interface WorkflowSyncResult {
   repo: string;

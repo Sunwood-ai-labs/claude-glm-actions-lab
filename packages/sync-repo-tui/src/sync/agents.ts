@@ -4,10 +4,10 @@
 
 import * as path from 'path';
 import * as fs from 'fs';
-import { directoryExists, findFiles, copyFile, createTempDir, removeTempDir } from '../utils/file';
-import { cloneRepo, hasChanges, addFiles, commit, push } from './git';
-import { AGENTS_SOURCE_PATH, GIT_USER_NAME, GIT_USER_EMAIL, AGENTS_COMMIT_MESSAGE } from '../config/constants';
-import { GitError } from '../utils/error';
+import { directoryExists, findFiles, copyFile, createTempDir, removeTempDir } from '../utils/file.js';
+import { cloneRepo, hasChanges, addFiles, commit, push } from './git.js';
+import { AGENTS_SOURCE_PATH, GIT_USER_NAME, GIT_USER_EMAIL, AGENTS_COMMIT_MESSAGE } from '../config/constants.js';
+import { GitError } from '../utils/error.js';
 
 export interface AgentSyncResult {
   repo: string;

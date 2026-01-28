@@ -2,9 +2,9 @@
  * 同期ロジックのエントリーポイント
  */
 
-import { syncWorkflowsToRepos, type WorkflowSyncResult } from './workflows';
-import { syncAgentsToRepos, type AgentSyncResult } from './agents';
-import type { SyncOptions } from '../config';
+import { syncWorkflowsToRepos, type WorkflowSyncResult } from './workflows.js';
+import { syncAgentsToRepos, type AgentSyncResult } from './agents.js';
+import type { SyncOptions } from '../config/index.js';
 
 export interface SyncResult {
   workflows?: WorkflowSyncResult[];

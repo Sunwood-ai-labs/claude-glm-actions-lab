@@ -3,7 +3,7 @@
  */
 
 import { execa } from 'execa';
-import { GitError } from '../utils/error';
+import { GitError } from '../utils/error.js';
 
 /**
  * Gitコマンドを実行
