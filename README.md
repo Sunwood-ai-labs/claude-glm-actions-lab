@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="./assets/header.svg" alt="claude-glm-actions-lab header" width="100%"/>
+  <img src="./assets/header.png" alt="claude-glm-actions-lab header" width="100%"/>
 
 
 # claude-glm-actions-lab
@@ -130,77 +130,16 @@ This project uses character-based AI agents for different tasks:
 
 ### Sync Scripts
 
-The repository includes synchronization scripts for managing sandbox testing:
+For detailed documentation, see: **[packages/sync-repo-tui/README.md](./packages/sync-repo-tui/README.md)**
 
-#### sync-repo.sh
-Main sync script that orchestrates secrets, workflows, and agents synchronization with an interactive TUI.
-
+**Quick Start:**
 ```bash
-./scripts/sync-repo.sh
+# Install from npm
+npm install -g @sunwood-ai-labs/sync-repo-tui
+
+# Launch TUI
+sync-repo-tui
 ```
-
-**Features:**
-- **Single repository mode**: Sync to a specific target repository
-- **Organization mode**: Sync to all repositories in an organization with exclusion list support
-- **Interactive ON/OFF toggle**: Selectively enable/disable sync items (Secrets, Workflows, Agents)
-
-**Configuration (`.env`):**
-```bash
-TARGET_REPO=Sunwood-ai-labs/claude-glm-actions-lab-sandbox  # Default target
-TARGET_ORG=Sunwood-ai-labs                                   # Default organization
-EXCLUDED_REPOS=claude-glm-actions-lab-sandbox                # Repositories to exclude
-```
-
-#### sync-secrets.sh
-Sync GitHub Secrets from `.env` file to target repository.
-
-```bash
-TARGET_REPO=org/repo ./scripts/sync-secrets.sh
-```
-
-**Configuration (`.env`):**
-```bash
-TARGET_REPO=Sunwood-ai-labs/claude-glm-actions-lab-sandbox
-SECRET_CLAUDE_GLM_DEV_API_KEY=your_api_key_here
-```
-
-#### sync-workflows.sh
-Sync workflow files to target repository.
-
-```bash
-TARGET_REPO=org/repo ./scripts/sync-workflows.sh
-```
-
-#### sync-agents.sh
-Sync agent files (`.claude/agents`) to target repository.
-
-```bash
-TARGET_REPO=org/repo ./scripts/sync-agents.sh
-```
-
-#### sync-repo-tui.sh
-Launch the TUI (Terminal User Interface) version of the sync tool.
-
-```bash
-./scripts/sync-repo-tui.sh
-```
-
-**Prerequisites:** Install the `sync-repo-tui` binary first:
-```bash
-./scripts/install-sync-repo-tui.sh
-```
-
-#### install-sync-repo-tui.sh
-Install the `sync-repo-tui` binary from GitHub Releases.
-
-```bash
-./scripts/install-sync-repo-tui.sh
-```
-
-**Supported Platforms:**
-- Linux (amd64, arm64)
-- macOS (amd64, arm64)
-- Windows (amd64)
 
 ### create-pr.py
 
