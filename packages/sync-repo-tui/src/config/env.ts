@@ -4,9 +4,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-
-// dotenvを直接import
-const dotenvResult = require('dotenv');
+import { config as dotenvConfig } from 'dotenv';
 
 export interface EnvConfig {
   TARGET_REPO?: string;
@@ -25,7 +23,7 @@ export function loadEnv(projectRoot: string): EnvConfig {
   }
 
   // dotenvでパース
-  const parsed = dotenvResult.config({ path: envPath }).parsed || {};
+  const parsed = dotenvConfig({ path: envPath }).parsed || {};
 
   return {
     TARGET_REPO: parsed.TARGET_REPO,

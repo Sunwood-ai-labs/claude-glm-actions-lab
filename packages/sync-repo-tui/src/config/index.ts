@@ -3,13 +3,13 @@
  */
 
 import * as path from 'path';
-import { loadEnv, checkEnvExists } from './env';
+import { loadEnv, checkEnvExists } from './env.js';
 import {
   DEFAULT_TARGET_REPO,
   DEFAULT_TARGET_ORG,
   DEFAULT_EXCLUDED_REPOS,
   type SyncItemType
-} from './constants';
+} from './constants.js';
 
 export interface SyncOptions {
   workflows: boolean;
