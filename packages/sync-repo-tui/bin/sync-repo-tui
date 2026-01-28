@@ -1,0 +1,7 @@
+#!/usr/bin/env node
+
+const path = require('path');
+
+// dist/index.jsを実行
+const distPath = path.join(__dirname, '..', 'dist', 'index.js');
+require(distPath);
